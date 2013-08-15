@@ -1,10 +1,26 @@
 package com.github.axet.wget;
 
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.RejectedExecutionHandler;
-import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * 
+ * SynchronousQueue - hungs while running. Seems like a bug in java (Max OSX Java 1.7.0-25)
+ * 
+ * Unsafe.park(boolean, long) line: not available [native method] [local
+ * variables unavailable]
+ * 
+ * LockSupport.park(Object) line: 186
+ * 
+ * SynchronousQueue$TransferStack.awaitFulfill(
+ * SynchronousQueue$TransferStack$SNode, boolean, long) line: 458
+ * 
+ * 
+ * @author axet
+ * 
+ */
 public class LimitThreadPool extends ThreadPoolExecutor {
     Object lock = new Object();
     int count = 0;
@@ -46,7 +62,7 @@ public class LimitThreadPool extends ThreadPoolExecutor {
     }
 
     public LimitThreadPool(int maxThreadCount) {
-        super(0, maxThreadCount, 0, TimeUnit.SECONDS, new SynchronousQueue<Runnable>(), new BlockUntilFree());
+        super(0, maxThreadCount, 0, TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(1), new BlockUntilFree());
     }
 
     protected void beforeExecute(Thread t, Runnable r) {
@@ -63,7 +79,6 @@ public class LimitThreadPool extends ThreadPoolExecutor {
 
         synchronized (lock) {
             count--;
-
             lock.notifyAll();
         }
     }
