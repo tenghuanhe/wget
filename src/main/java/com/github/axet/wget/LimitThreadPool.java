@@ -2,12 +2,14 @@ package com.github.axet.wget;
 
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.RejectedExecutionHandler;
+import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 /**
  * 
- * SynchronousQueue - hungs while running. Seems like a bug in java (Max OSX Java 1.7.0-25)
+ * SynchronousQueue - hung while running. Seems like a bug in java (Max OSX Java
+ * 1.7.0-25)
  * 
  * Unsafe.park(boolean, long) line: not available [native method] [local
  * variables unavailable]
@@ -66,10 +68,6 @@ public class LimitThreadPool extends ThreadPoolExecutor {
     }
 
     protected void beforeExecute(Thread t, Runnable r) {
-        synchronized (lock) {
-            count++;
-        }
-
         super.beforeExecute(t, r);
     }
 
@@ -88,7 +86,7 @@ public class LimitThreadPool extends ThreadPoolExecutor {
      */
     public boolean active() {
         synchronized (lock) {
-            return count > 0;
+            return (count) > 0;
         }
     }
 
@@ -131,6 +129,10 @@ public class LimitThreadPool extends ThreadPoolExecutor {
     }
 
     public void blockExecute(Runnable command) throws InterruptedException {
+        synchronized (lock) {
+            count++;
+        }
+
         execute(new SafetyCheck(command));
 
         if (Thread.interrupted())
