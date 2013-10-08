@@ -6,7 +6,7 @@ Support single thread, single thread with download continue / resume, and multit
 
 ## Exceptions
 
-Here is a three kind of super exceptions.
+Here is a five kind of exceptions.
 
 1) Fatal exception. all RuntimeException's
   We shall stop application
@@ -14,16 +14,16 @@ Here is a three kind of super exceptions.
 2) DownloadError (extends RuntimeException)
   We unable to process following url and shall stop to download it. It may be rised by problem with local file.
 
-2.1) DownloadInterrceptedError (extends DownloadError)
+3) DownloadMultipartError (extends DownloadError)
+  We unable to download multhread source. Shall stop downloading and parse each Parts exceptions.
+
+4) DownloadInterrceptedError (extends DownloadError)
   Current thread was interrcepted by main app (you). So handle it your self ;)
   
-2.2) DownloadIOError (extends DownloadError)
+5) DownloadIOError (extends DownloadError)
   Some simple exceptoins, like Timeout exceptions we handle internaly, and retry part / download automaticaly without
   user interrraction. But some hudge errors, like problems with file on server (HTTP 403) we pass to the App.
   It may stop download, or auto update download URL and automaticaly retry the download without any user interaction.
-
-3) DownloadMultipartError (extends DownloadError)
-  We unable to download multhread source. Shall stop downloading and parse each Parts exceptions.
 
 
 ## Example Direct Download
