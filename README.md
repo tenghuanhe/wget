@@ -6,7 +6,7 @@ Support single thread, single thread with download continue / resume, and multit
 
 ## Exceptions
 
-Here is a three kind of exceptions.
+Here is a five kind of exceptions.
 
 1) Fatal exception. all RuntimeException's
   We shall stop application
@@ -16,7 +16,7 @@ Here is a three kind of exceptions.
 
 3) DownloadMultipartError (extends DownloadError)
   We unable to download multhread source. Shall stop downloading and parse each Parts exceptions.
-  
+
 4) DownloadInterrceptedError (extends DownloadError)
   Current thread was interrcepted by main app (you). So handle it your self ;)
   
@@ -24,6 +24,7 @@ Here is a three kind of exceptions.
   Some simple exceptoins, like Timeout exceptions we handle internaly, and retry part / download automaticaly without
   user interrraction. But some hudge errors, like problems with file on server (HTTP 403) we pass to the App.
   It may stop download, or auto update download URL and automaticaly retry the download without any user interaction.
+
 
 ## Example Direct Download
 
@@ -154,5 +155,5 @@ Here is a three kind of exceptions.
     <dependency>
       <groupId>com.github.axet</groupId>
       <artifactId>wget</artifactId>
-      <version>1.2.8</version>
+      <version>1.2.9</version>
     </dependency>
