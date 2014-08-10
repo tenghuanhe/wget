@@ -143,6 +143,8 @@ public class RetryWrap {
         case HttpURLConnection.HTTP_PARTIAL:
             return;
         case HttpURLConnection.HTTP_MOVED_TEMP:
+        case HttpURLConnection.HTTP_MOVED_PERM:
+            // the user agent MUST NOT automatically redirect the request unless it can be confirmed by the user
             throw new DownloadMoved(c);
         case HttpURLConnection.HTTP_FORBIDDEN:
             throw new DownloadIOCodeError(HttpURLConnection.HTTP_FORBIDDEN);
