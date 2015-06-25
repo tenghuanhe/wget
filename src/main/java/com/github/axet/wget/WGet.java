@@ -58,8 +58,8 @@ public class WGet {
 
     /**
      * application controlled download / resume. you should specify targetfile
-     * name exactly. since you are choise resume / multipart download.
-     * application unable to control file name choise / creation.
+     * name exactly. since you are choice resume / multipart download.
+     * application unable to control file name choice / creation.
      * 
      * @param info
      * @param targetFile
