@@ -156,8 +156,10 @@ public class Example {
 
 ## Cetral Maven Repo
 
-    <dependency>
-      <groupId>com.github.axet</groupId>
-      <artifactId>wget</artifactId>
-      <version>1.2.12</version>
-    </dependency>
+```xml
+<dependency>
+  <groupId>com.github.axet</groupId>
+  <artifactId>wget</artifactId>
+  <version>1.2.12</version>
+</dependency>
+```
