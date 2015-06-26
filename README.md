@@ -4,6 +4,16 @@ wget direct / multithread / singlethread java download library.
 
 Support single thread, single thread with download continue / resume, and multithread downloads.
 
+## Features
+
+1) Handles for HTTP errors / redirects
+
+2) Multipart / thread downloads
+
+3) Handle for Content-Disposition (remote file name)
+
+4) Support for server RANGE feature (resume downloads / multipart logic)
+
 ## Exceptions
 
 Here is a five kind of exceptions.
