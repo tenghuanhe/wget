@@ -62,9 +62,9 @@ public class WGet {
      * application unable to control file name choice / creation.
      * 
      * @param info
+     *            download info
      * @param targetFile
-     * @param stop
-     * @param notify
+     *            target files
      */
     public WGet(DownloadInfo info, File targetFile) {
         this.info = info;
