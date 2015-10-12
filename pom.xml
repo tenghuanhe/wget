@@ -4,7 +4,7 @@
   <groupId>com.github.axet</groupId>
   <artifactId>wget</artifactId>
   <packaging>jar</packaging>
-  <version>1.2.12</version>
+  <version>1.2.13</version>
   <name>wget</name>
   <description>wget java single / multithread download library</description>
   <url>https://github.com/axet/wget</url>
@@ -37,7 +37,7 @@
     <developer>
       <id>axet</id>
       <name>Alexey Kuznetsov</name>
-      <email>ak@axet.ru</email>
+      <email>axet@me.com</email>
     </developer>
   </developers>
 

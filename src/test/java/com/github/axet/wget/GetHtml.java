@@ -10,7 +10,7 @@ public class GetHtml {
             String url = args[0];
 
             String h = WGet.getHtml(new URL(url));
-            
+
             System.out.println(h);
         } catch (Exception e) {
             e.printStackTrace();
