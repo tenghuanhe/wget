@@ -32,16 +32,19 @@ public abstract class Direct {
      *            download file information
      * @param target
      *            target file
-     * @param stop
-     *            multithread stop command
-     * @param notify
-     *            progress notify call
      */
     public Direct(DownloadInfo info, File target) {
         this.target = target;
         this.info = info;
     }
 
+    /**
+     * 
+     * @param stop
+     *            multithread stop command
+     * @param notify
+     *            progress notify call
+     */
     abstract public void download(AtomicBoolean stop, Runnable notify);
 
 }

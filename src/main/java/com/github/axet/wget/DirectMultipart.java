@@ -34,10 +34,6 @@ public class DirectMultipart extends Direct {
      *            download file information
      * @param target
      *            target file
-     * @param stop
-     *            multithread stop command
-     * @param notify
-     *            progress notify call
      */
     public DirectMultipart(DownloadInfo info, File target) {
         super(info, target);
@@ -50,6 +46,12 @@ public class DirectMultipart extends Direct {
      * RuntimeException or DownloadRetry or DownloadError
      * 
      * @param part
+     *            downloading part
+     * @param stop
+     *            multithread stop command
+     * @param notify
+     *            progress notify call
+     * 
      */
     void downloadPart(Part part, AtomicBoolean stop, Runnable notify) throws IOException {
         RandomAccessFile fos = null;
@@ -315,7 +317,9 @@ public class DirectMultipart extends Direct {
      * check all parts CRC
      * 
      * @param info
+     *            download information
      * @param targetFile
+     *            target file
      * @return return true - if all ok, false - if download can not be restored.
      */
     public static boolean canResume(DownloadInfo info, File targetFile) {

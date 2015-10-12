@@ -128,7 +128,9 @@ public class DirectRange extends Direct {
      * file size and inside state. they sould be equal.
      * 
      * @param info
+     *            download info
      * @param targetFile
+     *            target file
      * @return return true - if all ok, false - if download can not be restored.
      */
     public static boolean canResume(DownloadInfo info, File targetFile) {
