@@ -20,7 +20,7 @@ import com.github.axet.wget.info.ex.DownloadRetry;
 
 public class RetryWrap {
 
-    public static final int RETRY_DELAY = 10;
+    public static int RETRY_DELAY = 10;
 
     public interface WrapReturn<T> {
         public void retry(int delay, Throwable e);
