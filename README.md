@@ -14,6 +14,8 @@ Support single thread, single thread with download continue / resume, and multit
 
 4) Support for server RANGE feature (resume downloads / multipart logic)
 
+5) Support for Proxy
+
 ## Exceptions
 
 Here is a five kind of exceptions.
