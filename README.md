@@ -8,11 +8,13 @@ Support single thread, single thread with download continue / resume, and multit
 
 1) Handles for HTTP errors / redirects
 
-2) Multipart / thread downloads
+2) Multipart / multithread downloads
 
 3) Handle for Content-Disposition (remote file name)
 
 4) Support for server RANGE feature (resume downloads / multipart logic)
+
+5) Support for Proxy
 
 ## Exceptions
 
@@ -167,8 +169,10 @@ public class Example {
 
             // choise file
             URL url = new URL("http://download.virtualbox.org/virtualbox/4.2.4/VirtualBox-4.2.4-81684-OSX.dmg");
+            // set proxy, skip it if not nesseery
+            ProxyInfo proxy = new ProxyInfo("addr", 8080, "login", "password");
             // initialize url information object
-            info = new DownloadInfo(url);
+            info = new DownloadInfo(url, proxy);
             // extract infromation from the web
             info.extract(stop, notify);
             // enable multipart donwload
@@ -206,6 +210,6 @@ public class Example {
 <dependency>
   <groupId>com.github.axet</groupId>
   <artifactId>wget</artifactId>
-  <version>1.2.15</version>
+  <version>1.2.16</version>
 </dependency>
 ```
