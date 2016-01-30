@@ -208,6 +208,6 @@ public class Example {
 <dependency>
   <groupId>com.github.axet</groupId>
   <artifactId>wget</artifactId>
-  <version>1.2.15</version>
+  <version>1.2.16</version>
 </dependency>
 ```
