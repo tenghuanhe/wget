@@ -2,6 +2,7 @@ package com.github.axet.wget.info;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.net.Proxy;
 import java.net.URL;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Matcher;
@@ -69,8 +70,41 @@ public class URLInfo extends BrowserInfo {
      */
     private int delay;
 
+    private ProxyInfo proxy;
+    
+    /**
+     * connect socket timeout
+     */
+    static public final int CONNECT_TIMEOUT = 10000;
+
+    /**
+     * read socket timeout
+     */
+    static public final int READ_TIMEOUT = 10000;
+
     public URLInfo(URL source) {
         this.source = source;
+    }
+
+    public HttpURLConnection openConnection() throws IOException {
+        URL url = getSource();
+
+        HttpURLConnection conn;
+
+        if (getProxy() != null) {
+            conn = (HttpURLConnection) url.openConnection(getProxy().proxy);
+        } else {
+            conn = (HttpURLConnection) url.openConnection();
+        }
+
+        conn.setConnectTimeout(CONNECT_TIMEOUT);
+        conn.setReadTimeout(READ_TIMEOUT);
+
+        conn.setRequestProperty("User-Agent", getUserAgent());
+        if (getReferer() != null)
+            conn.setRequestProperty("Referer", getReferer().toExternalForm());
+
+        return conn;
     }
 
     public void extract() {
@@ -87,6 +121,11 @@ public class URLInfo extends BrowserInfo {
 
             conn = RetryWrap.wrap(stop, new RetryWrap.WrapReturn<HttpURLConnection>() {
                 URL url = source;
+
+                @Override
+                public void proxy() {
+                    getProxy().set();
+                }
 
                 @Override
                 public HttpURLConnection download() throws IOException {
@@ -155,15 +194,8 @@ public class URLInfo extends BrowserInfo {
 
     // if range failed - do plain download with no retrys's
     protected HttpURLConnection extractRange(URL source) throws IOException {
-        URL url = source;
-        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-
-        conn.setConnectTimeout(Direct.CONNECT_TIMEOUT);
-        conn.setReadTimeout(Direct.READ_TIMEOUT);
-
-        conn.setRequestProperty("User-Agent", getUserAgent());
-        if (getReferer() != null)
-            conn.setRequestProperty("Referer", getReferer().toExternalForm());
+        URLInfo url = new URLInfo(source);
+        HttpURLConnection conn = url.openConnection();
 
         // may raise an exception if not supported by server
         conn.setRequestProperty("Range", "bytes=" + 0 + "-" + 0);
@@ -189,15 +221,8 @@ public class URLInfo extends BrowserInfo {
 
     // if range failed - do plain download with no retrys's
     protected HttpURLConnection extractNormal(URL source) throws IOException {
-        URL url = source;
-        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-
-        conn.setConnectTimeout(Direct.CONNECT_TIMEOUT);
-        conn.setReadTimeout(Direct.READ_TIMEOUT);
-
-        conn.setRequestProperty("User-Agent", getUserAgent());
-        if (getReferer() != null)
-            conn.setRequestProperty("Referer", getReferer().toExternalForm());
+        URLInfo url = new URLInfo(source);
+        HttpURLConnection conn = url.openConnection();
 
         setRange(false);
 
@@ -279,6 +304,14 @@ public class URLInfo extends BrowserInfo {
 
     synchronized public void setRange(boolean range) {
         this.range = range;
+    }
+
+    synchronized public ProxyInfo getProxy() {
+        return proxy;
+    }
+
+    synchronized public void setProxy(ProxyInfo proxy) {
+        this.proxy = proxy;
     }
 
 }

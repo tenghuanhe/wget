@@ -12,16 +12,6 @@ public abstract class Direct {
     DownloadInfo info;
 
     /**
-     * connect socket timeout
-     */
-    static public final int CONNECT_TIMEOUT = 10000;
-
-    /**
-     * read socket timeout
-     */
-    static public final int READ_TIMEOUT = 10000;
-
-    /**
      * size of read buffer
      */
     static public final int BUF_SIZE = 4 * 1024;
