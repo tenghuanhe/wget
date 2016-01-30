@@ -17,4 +17,7 @@ public class DownloadIOCodeError extends DownloadError {
         return code;
     }
 
+    public String toString() {
+        return DownloadIOCodeError.class.getName() + " " + code;
+    }
 }
