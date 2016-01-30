@@ -7,6 +7,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import com.github.axet.wget.info.DownloadInfo;
 import com.github.axet.wget.info.DownloadInfo.Part;
 import com.github.axet.wget.info.DownloadInfo.Part.States;
+import com.github.axet.wget.info.ProxyInfo;
 import com.github.axet.wget.info.ex.DownloadMultipartError;
 
 public class ExampleApplicationManaged {
@@ -57,8 +58,10 @@ public class ExampleApplicationManaged {
 
             // choise file
             URL url = new URL("http://download.virtualbox.org/virtualbox/4.2.4/VirtualBox-4.2.4-81684-OSX.dmg");
+            // set proxy, skip it if not nesseery
+            ProxyInfo proxy = new ProxyInfo("addr", 8080, "login", "password");
             // initialize url information object
-            info = new DownloadInfo(url);
+            info = new DownloadInfo(url, proxy);
             // extract infromation from the web
             info.extract(stop, notify);
             // enable multipart donwload
