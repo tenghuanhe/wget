@@ -8,7 +8,7 @@ Support single thread, single thread with download continue / resume, and multit
 
 1) Handles for HTTP errors / redirects
 
-2) Multipart / thread downloads
+2) Multipart / multithread downloads
 
 3) Handle for Content-Disposition (remote file name)
 
