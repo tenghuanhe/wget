@@ -58,8 +58,6 @@ public class DirectMultipart extends Direct {
         BufferedInputStream binaryreader = null;
 
         try {
-            URL url = info.getSource();
-
             long start = part.getStart() + part.getCount();
             long end = part.getEnd();
 
@@ -67,15 +65,7 @@ public class DirectMultipart extends Direct {
             if (end - start + 1 == 0)
                 return;
 
-            HttpURLConnection conn;
-            conn = (HttpURLConnection) url.openConnection();
-
-            conn.setConnectTimeout(CONNECT_TIMEOUT);
-            conn.setReadTimeout(READ_TIMEOUT);
-
-            conn.setRequestProperty("User-Agent", info.getUserAgent());
-            if (info.getReferer() != null)
-                conn.setRequestProperty("Referer", info.getReferer().toExternalForm());
+            HttpURLConnection conn = info.openConnection();
 
             File f = target;
 
@@ -162,6 +152,11 @@ public class DirectMultipart extends Direct {
 
                 try {
                     RetryWrap.wrap(stop, new RetryWrap.Wrap() {
+
+                        @Override
+                        public void proxy() {
+                            info.getProxy().set();
+                        }
 
                         @Override
                         public void download() throws IOException {

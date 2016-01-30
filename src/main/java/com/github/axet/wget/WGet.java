@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.Authenticator;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLDecoder;
@@ -16,6 +17,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 
 import com.github.axet.wget.info.DownloadInfo;
+import com.github.axet.wget.info.ex.DownloadError;
 import com.github.axet.wget.info.ex.DownloadInterruptedError;
 
 public class WGet {
@@ -181,6 +183,22 @@ public class WGet {
         }, new AtomicBoolean(false));
     }
 
+    public static String getHtml(DownloadInfo info) {
+        return getHtml(info, new HtmlLoader() {
+            @Override
+            public void notifyRetry(int delay, Throwable e) {
+            }
+
+            @Override
+            public void notifyDownloading() {
+            }
+
+            @Override
+            public void notifyMoved() {
+            }
+        }, new AtomicBoolean(false));
+    }
+
     public static String getHtml(final URL source, final HtmlLoader load, final AtomicBoolean stop) {
         return getHtml(new DownloadInfo(source), load, stop);
     }
@@ -190,22 +208,18 @@ public class WGet {
             DownloadInfo info = source;
 
             @Override
+            public void proxy() {
+                info.getProxy().set();
+            }
+
+            @Override
             public void retry(int delay, Throwable e) {
                 load.notifyRetry(delay, e);
             }
 
             @Override
             public String download() throws IOException {
-                HttpURLConnection conn = null;
-
-                conn = (HttpURLConnection) info.getSource().openConnection();
-
-                conn.setConnectTimeout(Direct.CONNECT_TIMEOUT);
-                conn.setReadTimeout(Direct.READ_TIMEOUT);
-
-                conn.setRequestProperty("User-Agent", info.getUserAgent());
-                if (info.getReferer() != null)
-                    conn.setRequestProperty("Referer", info.getReferer().toExternalForm());
+                HttpURLConnection conn = info.openConnection();
 
                 RetryWrap.check(conn);
 

@@ -17,12 +17,16 @@ import com.github.axet.wget.info.ex.DownloadIOError;
 import com.github.axet.wget.info.ex.DownloadInterruptedError;
 import com.github.axet.wget.info.ex.DownloadMoved;
 import com.github.axet.wget.info.ex.DownloadRetry;
+import com.github.axet.wget.info.ex.ProxyAuth;
 
 public class RetryWrap {
 
     public static int RETRY_DELAY = 10;
+    public static int RETRY_SLEEP = 1000;
 
     public interface WrapReturn<T> {
+        public void proxy();
+
         public void retry(int delay, Throwable e);
 
         public void moved(URL url);
@@ -31,6 +35,8 @@ public class RetryWrap {
     }
 
     public interface Wrap {
+        public void proxy();
+
         public void retry(int delay, Throwable e);
 
         public void moved(URL url);
@@ -59,7 +65,7 @@ public class RetryWrap {
                 throw new DownloadInterruptedError("interrrupted");
 
             try {
-                Thread.sleep(1000);
+                Thread.sleep(RETRY_SLEEP);
             } catch (InterruptedException e1) {
                 throw new DownloadInterruptedError(e1);
             }
@@ -75,9 +81,19 @@ public class RetryWrap {
 
             try {
                 try {
-                    T t = r.download();
-
-                    return t;
+                    try {
+                        T t = r.download();
+                        return t;
+                    } catch (ProxyAuth e) {
+                        // retry with proxy set
+                        r.proxy();
+                        // if we will get another proxy exception. do not retry
+                        // but stop download
+                        T t = r.download();
+                        return t;
+                    }
+                } catch (ProxyAuth e) {
+                    throw new DownloadError(e);
                 } catch (SocketException e) {
                     // enumerate all retry exceptions
                     throw new DownloadRetry(e);
@@ -118,7 +134,6 @@ public class RetryWrap {
             @Override
             public Object download() throws IOException {
                 r.download();
-
                 return null;
             }
 
@@ -130,6 +145,11 @@ public class RetryWrap {
             @Override
             public void moved(URL url) {
                 r.moved(url);
+            }
+
+            @Override
+            public void proxy() {
+                r.proxy();
             }
         };
 
@@ -147,6 +167,8 @@ public class RetryWrap {
             // rfc2616: the user agent MUST NOT automatically redirect the
             // request unless it can be confirmed by the user
             throw new DownloadMoved(c);
+        case HttpURLConnection.HTTP_PROXY_AUTH:
+            throw new ProxyAuth(c);
         case HttpURLConnection.HTTP_FORBIDDEN:
             throw new DownloadIOCodeError(HttpURLConnection.HTTP_FORBIDDEN);
         case 416:

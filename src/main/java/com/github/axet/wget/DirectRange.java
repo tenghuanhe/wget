@@ -25,16 +25,7 @@ public class DirectRange extends Direct {
         BufferedInputStream binaryreader = null;
 
         try {
-            URL url = info.getSource();
-
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-
-            conn.setConnectTimeout(CONNECT_TIMEOUT);
-            conn.setReadTimeout(READ_TIMEOUT);
-
-            conn.setRequestProperty("User-Agent", info.getUserAgent());
-            if (info.getReferer() != null)
-                conn.setRequestProperty("Referer", info.getReferer().toExternalForm());
+            HttpURLConnection conn = info.openConnection();
 
             File f = target;
             if (!f.exists())
@@ -87,6 +78,11 @@ public class DirectRange extends Direct {
 
         try {
             RetryWrap.wrap(stop, new RetryWrap.Wrap() {
+                @Override
+                public void proxy() {
+                    info.getProxy().set();
+                }
+
                 @Override
                 public void download() throws IOException {
                     info.setState(URLInfo.States.DOWNLOADING);

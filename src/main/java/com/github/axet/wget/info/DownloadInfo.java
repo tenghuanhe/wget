@@ -142,6 +142,12 @@ public class DownloadInfo extends URLInfo {
         super(source);
     }
 
+    public DownloadInfo(URL source, ProxyInfo p) {
+        super(source);
+
+        setProxy(p);
+    }
+
     /**
      * is it a multipart download?
      * 
