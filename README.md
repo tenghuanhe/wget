@@ -121,11 +121,25 @@ import com.github.axet.wget.info.DownloadInfo.Part;
 import com.github.axet.wget.info.DownloadInfo.Part.States;
 import com.github.axet.wget.info.ex.DownloadMultipartError;
 
-public class Example {
+public class ExampleApplicationManaged {
 
     AtomicBoolean stop = new AtomicBoolean(false);
     DownloadInfo info;
     long last;
+    SpeedInfo speedInfo = new SpeedInfo();
+
+    public static String formatSpeed(int bytes) {
+        String str = "";
+        float speed = bytes;
+        if (speed < 1000000) {
+            speed /= 1024;
+            str += String.format("%.02f", speed) + " KB/s";
+        } else {
+            speed /= 1024 * 1024;
+            str += String.format("%.02f", speed) + " MB/s";
+        }
+        return str;
+    }
 
     public void run() {
         try {
@@ -144,6 +158,7 @@ public class Example {
                         System.out.println(info.getState() + " " + info.getDelay());
                         break;
                     case DOWNLOADING:
+                        speedInfo.step(info.getCount());
                         long now = System.currentTimeMillis();
                         if (now - 1000 > last) {
                             last = now;
@@ -157,8 +172,10 @@ public class Example {
                                 }
                             }
 
-                            System.out.println(String.format("%.2f %s", info.getCount() / (float) info.getLength(),
-                                    parts));
+                            System.out.println(
+                                    String.format("%.2f %s (%s / %s)", info.getCount() / (float) info.getLength(),
+                                            parts, formatSpeed(speedInfo.getCurrentSpeed()),
+                                            formatSpeed(speedInfo.getAverageSpeed())));
                         }
                         break;
                     default:
@@ -167,20 +184,29 @@ public class Example {
                 }
             };
 
-            // choise file
-            URL url = new URL("http://download.virtualbox.org/virtualbox/4.2.4/VirtualBox-4.2.4-81684-OSX.dmg");
-            // set proxy, skip it if not nesseery
-            ProxyInfo proxy = new ProxyInfo("addr", 8080, "login", "password");
-            // initialize url information object
-            info = new DownloadInfo(url, proxy);
+            // choice file
+            URL url = new URL("http://download.virtualbox.org/virtualbox/5.0.16/VirtualBox-5.0.16-105871-OSX.dmg");
+
+            // initialize url information object with or without proxy
+            info = new DownloadInfo(url); // new DownloadInfo(url, new
+                                          // ProxyInfo("proxy_addr", 8080,
+                                          // "login", "password"))
+
             // extract infromation from the web
             info.extract(stop, notify);
+
             // enable multipart donwload
             info.enableMultipart();
-            // Choise target file
-            File target = new File("/Users/axet/Downloads/VirtualBox-4.2.4-81684-OSX.dmg");
+
+            // Choice target file or set download folder
+            File target = new File("/Users/axet/Downloads/VirtualBox-5.0.16-105871-OSX.dmg");
+
             // create wget downloader
             WGet w = new WGet(info, target);
+
+            // init speedinfo
+            speedInfo.start(0);
+
             // will blocks until download finishes
             w.download(stop, notify);
         } catch (DownloadMultipartError e) {
@@ -197,10 +223,9 @@ public class Example {
     }
 
     public static void main(String[] args) {
-        Example e = new Example();
+        ExampleApplicationManaged e = new ExampleApplicationManaged();
         e.run();
     }
-
 }
 ```
 
