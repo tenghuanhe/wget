@@ -3,9 +3,8 @@ package com.github.axet.wget;
 import java.util.ArrayList;
 
 public class SpeedInfo {
-
-    public static final int SAMPLE_LENGTH = 1000;
-    public static final int SAMPLE_MAX = 20;
+    public static int SAMPLE_LENGTH = 1000;
+    public static int SAMPLE_MAX = 20;
 
     public class Sample {
         // bytes downloaded
@@ -75,9 +74,17 @@ public class SpeedInfo {
     synchronized public void end(long current) {
         long now = System.currentTimeMillis();
 
-        long lastUpdate = getLastUpdate();
-        // step() may be at exact time with end(). skip it then.
-        if (lastUpdate < now)
+        long lastUpdate = 0;
+        long lastCurrent = 0;
+
+        if (samples.size() > 0) {
+            Sample s = samples.get(samples.size() - 1);
+            lastUpdate = s.now;
+            lastCurrent = s.current;
+        }
+
+        // step() may be at exact time or position with end(). skip it then.
+        if (lastUpdate < now && lastCurrent < current)
             add(new Sample(current, now));
     }
 
