@@ -16,6 +16,8 @@ Support single thread, single thread with download continue / resume, and multit
 
 5) Proxy support
 
+6) Speed measurments
+
 ## Exceptions
 
 Here is a five kind of exceptions.
