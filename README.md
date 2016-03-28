@@ -172,10 +172,16 @@ public class ExampleApplicationManaged {
                                 }
                             }
 
-                            System.out.println(
-                                    String.format("%.2f %s (%s / %s)", info.getCount() / (float) info.getLength(),
-                                            parts, formatSpeed(speedInfo.getCurrentSpeed()),
-                                            formatSpeed(speedInfo.getAverageSpeed())));
+                            float p = info.getCount() / (float) info.getLength();
+
+                            // finish speed calculation by adding remaining bytes speed
+                            if (p == 1) {
+                                speedInfo.end(info.getCount());
+                            }
+
+                            System.out.println(String.format("%.2f %s (%s / %s)", p, parts,
+                                    formatSpeed(speedInfo.getCurrentSpeed()),
+                                    formatSpeed(speedInfo.getAverageSpeed())));
                         }
                         break;
                     default:
@@ -192,10 +198,10 @@ public class ExampleApplicationManaged {
                                           // ProxyInfo("proxy_addr", 8080,
                                           // "login", "password"))
 
-            // extract infromation from the web
+            // extract information from the web
             info.extract(stop, notify);
 
-            // enable multipart donwload
+            // enable multipart download
             info.enableMultipart();
 
             // Choice target file or set download folder
