@@ -7,7 +7,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import com.github.axet.wget.info.DownloadInfo;
 import com.github.axet.wget.info.DownloadInfo.Part;
 import com.github.axet.wget.info.DownloadInfo.Part.States;
-import com.github.axet.wget.info.ProxyInfo;
 import com.github.axet.wget.info.ex.DownloadMultipartError;
 
 public class ExampleApplicationManaged {
@@ -15,6 +14,20 @@ public class ExampleApplicationManaged {
     AtomicBoolean stop = new AtomicBoolean(false);
     DownloadInfo info;
     long last;
+    SpeedInfo speedInfo = new SpeedInfo();
+
+    public static String formatSpeed(int bytes) {
+        String str = "";
+        float speed = bytes;
+        if (speed < 1000000) {
+            speed /= 1024;
+            str += String.format("%.02f", speed) + " KB/s";
+        } else {
+            speed /= 1024 * 1024;
+            str += String.format("%.02f", speed) + " MB/s";
+        }
+        return str;
+    }
 
     public void run() {
         try {
@@ -33,6 +46,7 @@ public class ExampleApplicationManaged {
                         System.out.println(info.getState() + " " + info.getDelay());
                         break;
                     case DOWNLOADING:
+                        speedInfo.step(info.getCount());
                         long now = System.currentTimeMillis();
                         if (now - 1000 > last) {
                             last = now;
@@ -46,8 +60,16 @@ public class ExampleApplicationManaged {
                                 }
                             }
 
-                            System.out.println(
-                                    String.format("%.2f %s", info.getCount() / (float) info.getLength(), parts));
+                            float p = info.getCount() / (float) info.getLength();
+
+                            // finish speed calculation by adding remaining bytes speed
+                            if (p == 1) {
+                                speedInfo.end(info.getCount());
+                            }
+
+                            System.out.println(String.format("%.2f %s (%s / %s)", p, parts,
+                                    formatSpeed(speedInfo.getCurrentSpeed()),
+                                    formatSpeed(speedInfo.getAverageSpeed())));
                         }
                         break;
                     default:
@@ -56,20 +78,29 @@ public class ExampleApplicationManaged {
                 }
             };
 
-            // choise file
-            URL url = new URL("http://download.virtualbox.org/virtualbox/4.2.4/VirtualBox-4.2.4-81684-OSX.dmg");
-            // set proxy, skip it if not nesseery
-            ProxyInfo proxy = new ProxyInfo("addr", 8080, "login", "password");
-            // initialize url information object
-            info = new DownloadInfo(url, proxy);
-            // extract infromation from the web
+            // choice file
+            URL url = new URL("http://download.virtualbox.org/virtualbox/5.0.16/VirtualBox-5.0.16-105871-OSX.dmg");
+
+            // initialize url information object with or without proxy
+            info = new DownloadInfo(url); // new DownloadInfo(url, new
+                                          // ProxyInfo("proxy_addr", 8080,
+                                          // "login", "password"))
+
+            // extract information from the web
             info.extract(stop, notify);
-            // enable multipart donwload
+
+            // enable multipart download
             info.enableMultipart();
-            // Choise target file
-            File target = new File("/Users/axet/Downloads/VirtualBox-4.2.4-81684-OSX.dmg");
+
+            // Choice target file or set download folder
+            File target = new File("/Users/axet/Downloads/VirtualBox-5.0.16-105871-OSX.dmg");
+
             // create wget downloader
             WGet w = new WGet(info, target);
+
+            // init speedinfo
+            speedInfo.start(0);
+
             // will blocks until download finishes
             w.download(stop, notify);
         } catch (DownloadMultipartError e) {
@@ -89,5 +120,4 @@ public class ExampleApplicationManaged {
         ExampleApplicationManaged e = new ExampleApplicationManaged();
         e.run();
     }
-
 }

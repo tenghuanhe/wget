@@ -72,6 +72,15 @@ public class SpeedInfo {
         }
     }
 
+    synchronized public void end(long current) {
+        long now = System.currentTimeMillis();
+
+        long lastUpdate = getLastUpdate();
+        // step() may be at exact time with end(). skip it then.
+        if (lastUpdate < now)
+            add(new Sample(current, now));
+    }
+
     /**
      * Current download speed
      * 
