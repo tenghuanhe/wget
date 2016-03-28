@@ -16,6 +16,8 @@ Support single thread, single thread with download continue / resume, and multit
 
 5) Proxy support
 
+6) Speed measurments
+
 ## Exceptions
 
 Here is a five kind of exceptions.
@@ -172,10 +174,16 @@ public class ExampleApplicationManaged {
                                 }
                             }
 
-                            System.out.println(
-                                    String.format("%.2f %s (%s / %s)", info.getCount() / (float) info.getLength(),
-                                            parts, formatSpeed(speedInfo.getCurrentSpeed()),
-                                            formatSpeed(speedInfo.getAverageSpeed())));
+                            float p = info.getCount() / (float) info.getLength();
+
+                            // finish speed calculation by adding remaining bytes speed
+                            if (p == 1) {
+                                speedInfo.end(info.getCount());
+                            }
+
+                            System.out.println(String.format("%.2f %s (%s / %s)", p, parts,
+                                    formatSpeed(speedInfo.getCurrentSpeed()),
+                                    formatSpeed(speedInfo.getAverageSpeed())));
                         }
                         break;
                     default:
@@ -192,10 +200,10 @@ public class ExampleApplicationManaged {
                                           // ProxyInfo("proxy_addr", 8080,
                                           // "login", "password"))
 
-            // extract infromation from the web
+            // extract information from the web
             info.extract(stop, notify);
 
-            // enable multipart donwload
+            // enable multipart download
             info.enableMultipart();
 
             // Choice target file or set download folder
@@ -235,6 +243,6 @@ public class ExampleApplicationManaged {
 <dependency>
   <groupId>com.github.axet</groupId>
   <artifactId>wget</artifactId>
-  <version>1.2.17</version>
+  <version>1.2.18</version>
 </dependency>
 ```
