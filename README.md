@@ -130,17 +130,17 @@ public class ExampleApplicationManaged {
     long last;
     SpeedInfo speedInfo = new SpeedInfo();
 
-    public static String formatSpeed(int bytes) {
-        String str = "";
-        float speed = bytes;
-        if (speed < 1000000) {
-            speed /= 1024;
-            str += String.format("%.02f", speed) + " KB/s";
+    public static String formatSpeed(long s) {
+        if (s > 0.1 * 1024 * 1024 * 1024) {
+            float f = s / 1024f / 1024f / 1024f;
+            return String.format("%.1f GB", f);
+        } else if (s > 0.1 * 1024 * 1024) {
+            float f = s / 1024f / 1024f;
+            return String.format("%.1f MB", f);
         } else {
-            speed /= 1024 * 1024;
-            str += String.format("%.02f", speed) + " MB/s";
+            float f = s / 1024f;
+            return String.format("%.1f kb", f);
         }
-        return str;
     }
 
     public void run() {
@@ -153,8 +153,13 @@ public class ExampleApplicationManaged {
                     switch (info.getState()) {
                     case EXTRACTING:
                     case EXTRACTING_DONE:
-                    case DONE:
                         System.out.println(info.getState());
+                        break;
+                    case DONE:
+                        // finish speed calculation by adding remaining bytes speed
+                        speedInfo.end(info.getCount());
+                        // print speed
+                        System.out.println(String.format("%s average speed (%s)", info.getState(), formatSpeed(speedInfo.getAverageSpeed())));
                         break;
                     case RETRYING:
                         System.out.println(info.getState() + " " + info.getDelay());
@@ -176,11 +181,6 @@ public class ExampleApplicationManaged {
 
                             float p = info.getCount() / (float) info.getLength();
 
-                            // finish speed calculation by adding remaining bytes speed
-                            if (p == 1) {
-                                speedInfo.end(info.getCount());
-                            }
-
                             System.out.println(String.format("%.2f %s (%s / %s)", p, parts,
                                     formatSpeed(speedInfo.getCurrentSpeed()),
                                     formatSpeed(speedInfo.getAverageSpeed())));
@@ -194,27 +194,19 @@ public class ExampleApplicationManaged {
 
             // choice file
             URL url = new URL("http://download.virtualbox.org/virtualbox/5.0.16/VirtualBox-5.0.16-105871-OSX.dmg");
-
             // initialize url information object with or without proxy
-            info = new DownloadInfo(url); // new DownloadInfo(url, new
-                                          // ProxyInfo("proxy_addr", 8080,
-                                          // "login", "password"))
-
+            // info = new DownloadInfo(url, new ProxyInfo("proxy_addr", 8080, "login", "password"));
+            info = new DownloadInfo(url);
             // extract information from the web
             info.extract(stop, notify);
-
             // enable multipart download
             info.enableMultipart();
-
             // Choice target file or set download folder
             File target = new File("/Users/axet/Downloads/VirtualBox-5.0.16-105871-OSX.dmg");
-
             // create wget downloader
             WGet w = new WGet(info, target);
-
             // init speedinfo
             speedInfo.start(0);
-
             // will blocks until download finishes
             w.download(stop, notify);
         } catch (DownloadMultipartError e) {
