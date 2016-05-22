@@ -235,6 +235,6 @@ public class ExampleApplicationManaged {
 <dependency>
   <groupId>com.github.axet</groupId>
   <artifactId>wget</artifactId>
-  <version>1.2.19</version>
+  <version>1.2.20</version>
 </dependency>
 ```
