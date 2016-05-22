@@ -249,6 +249,8 @@ public class WGet {
 
                     if (stop.get())
                         throw new DownloadInterruptedError("stop");
+                    if(Thread.currentThread().isInterrupted())
+                        throw new DownloadInterruptedError("interrupted");
                 }
 
                 return contents.toString();

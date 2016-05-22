@@ -20,7 +20,7 @@ import com.github.axet.wget.info.ex.DownloadRetry;
 import com.github.axet.wget.info.ex.ProxyAuth;
 
 public class RetryWrap {
-
+    // you can change those values once at program start
     public static int RETRY_DELAY = 10;
     public static int RETRY_SLEEP = 1000;
 
@@ -47,7 +47,6 @@ public class RetryWrap {
     static <T> void moved(AtomicBoolean stop, WrapReturn<T> r, DownloadMoved e) {
         if (stop.get())
             throw new DownloadInterruptedError("stop");
-
         if (Thread.currentThread().isInterrupted())
             throw new DownloadInterruptedError("interrrupted");
 
@@ -60,7 +59,6 @@ public class RetryWrap {
 
             if (stop.get())
                 throw new DownloadInterruptedError("stop");
-
             if (Thread.currentThread().isInterrupted())
                 throw new DownloadInterruptedError("interrrupted");
 
@@ -83,6 +81,11 @@ public class RetryWrap {
                 try {
                     try {
                         T t = r.download();
+                        // in case if download were interrupted by Thread.interrupt() we may get no error
+                        if (stop.get())
+                            throw new DownloadInterruptedError("stop");
+                        if (Thread.currentThread().isInterrupted())
+                            throw new DownloadInterruptedError("interrupted");
                         return t;
                     } catch (ProxyAuth e) {
                         // retry with proxy set
@@ -90,6 +93,11 @@ public class RetryWrap {
                         // if we will get another proxy exception. do not retry
                         // but stop download
                         T t = r.download();
+                        // in case if download were interrupted by Thread.interrupt() we may get no error
+                        if (stop.get())
+                            throw new DownloadInterruptedError("stop");
+                        if (Thread.currentThread().isInterrupted())
+                            throw new DownloadInterruptedError("interrupted");
                         return t;
                     }
                 } catch (ProxyAuth e) {
@@ -114,6 +122,10 @@ public class RetryWrap {
                 } catch (RuntimeException e) {
                     throw e;
                 } catch (IOException e) {
+                    // http://stackoverflow.com/questions/1561364/the-cause-of-interruptedexception
+                    if (Thread.currentThread().isInterrupted()) {
+                        throw new DownloadInterruptedError(e);
+                    }
                     throw new DownloadIOError(e);
                 }
             } catch (DownloadMoved e) {
@@ -130,7 +142,6 @@ public class RetryWrap {
 
     public static void wrap(AtomicBoolean stop, final Wrap r) {
         WrapReturn<Object> rr = new WrapReturn<Object>() {
-
             @Override
             public Object download() throws IOException {
                 r.download();
@@ -170,7 +181,7 @@ public class RetryWrap {
         case HttpURLConnection.HTTP_PROXY_AUTH:
             throw new ProxyAuth(c);
         case HttpURLConnection.HTTP_FORBIDDEN:
-            throw new DownloadIOCodeError(HttpURLConnection.HTTP_FORBIDDEN);
+            throw new DownloadIOCodeError(code);
         case 416:
             // HTTP Error 416 - Requested Range Not Satisfiable
             throw new DownloadIOCodeError(416);
