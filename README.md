@@ -133,13 +133,13 @@ public class ExampleApplicationManaged {
     public static String formatSpeed(long s) {
         if (s > 0.1 * 1024 * 1024 * 1024) {
             float f = s / 1024f / 1024f / 1024f;
-            return String.format("%.1f GB", f);
+            return String.format("%.1f GB/s", f);
         } else if (s > 0.1 * 1024 * 1024) {
             float f = s / 1024f / 1024f;
-            return String.format("%.1f MB", f);
+            return String.format("%.1f MB/s", f);
         } else {
             float f = s / 1024f;
-            return String.format("%.1f kb", f);
+            return String.format("%.1f kb/s", f);
         }
     }
 
@@ -235,6 +235,6 @@ public class ExampleApplicationManaged {
 <dependency>
   <groupId>com.github.axet</groupId>
   <artifactId>wget</artifactId>
-  <version>1.2.19</version>
+  <version>1.2.20</version>
 </dependency>
 ```
