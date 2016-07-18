@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.Authenticator;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLDecoder;
@@ -17,7 +16,6 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 
 import com.github.axet.wget.info.DownloadInfo;
-import com.github.axet.wget.info.ex.DownloadError;
 import com.github.axet.wget.info.ex.DownloadInterruptedError;
 
 public class WGet {
@@ -59,9 +57,8 @@ public class WGet {
     }
 
     /**
-     * application controlled download / resume. you should specify targetfile
-     * name exactly. since you are choice resume / multipart download.
-     * application unable to control file name choice / creation.
+     * application controlled download / resume. you should specify targetfile name exactly. since you are choice resume
+     * / multipart download. application unable to control file name choice / creation.
      * 
      * @param info
      *            download info
@@ -223,37 +220,7 @@ public class WGet {
 
                 RetryWrap.check(conn);
 
-                InputStream is = conn.getInputStream();
-
-                String enc = conn.getContentEncoding();
-
-                if (enc == null) {
-                    Pattern p = Pattern.compile("charset=(.*)");
-                    Matcher m = p.matcher(conn.getHeaderField("Content-Type"));
-                    if (m.find()) {
-                        enc = m.group(1);
-                    }
-                }
-
-                if (enc == null)
-                    enc = "UTF-8";
-
-                BufferedReader br = new BufferedReader(new InputStreamReader(is, enc));
-
-                String line = null;
-
-                StringBuilder contents = new StringBuilder();
-                while ((line = br.readLine()) != null) {
-                    contents.append(line);
-                    contents.append("\n");
-
-                    if (stop.get())
-                        throw new DownloadInterruptedError("stop");
-                    if(Thread.currentThread().isInterrupted())
-                        throw new DownloadInterruptedError("interrupted");
-                }
-
-                return contents.toString();
+                return getHtml(conn, stop);
             }
 
             @Override
@@ -268,5 +235,39 @@ public class WGet {
         });
 
         return html;
+    }
+
+    public static String getHtml(HttpURLConnection conn, AtomicBoolean stop) throws IOException {
+        InputStream is = conn.getInputStream();
+
+        String enc = conn.getContentEncoding();
+
+        if (enc == null) {
+            Pattern p = Pattern.compile("charset=(.*)");
+            Matcher m = p.matcher(conn.getHeaderField("Content-Type"));
+            if (m.find()) {
+                enc = m.group(1);
+            }
+        }
+
+        if (enc == null)
+            enc = "UTF-8";
+
+        BufferedReader br = new BufferedReader(new InputStreamReader(is, enc));
+
+        String line = null;
+
+        StringBuilder contents = new StringBuilder();
+        while ((line = br.readLine()) != null) {
+            contents.append(line);
+            contents.append("\n");
+
+            if (stop.get())
+                throw new DownloadInterruptedError("stop");
+            if (Thread.currentThread().isInterrupted())
+                throw new DownloadInterruptedError("interrupted");
+        }
+
+        return contents.toString();
     }
 }

@@ -2,14 +2,17 @@ package com.github.axet.wget.info;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
-import java.net.Proxy;
 import java.net.URL;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.github.axet.wget.Direct;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.select.Elements;
+
 import com.github.axet.wget.RetryWrap;
+import com.github.axet.wget.WGet;
 import com.github.axet.wget.info.ex.DownloadRetry;
 
 /**
@@ -30,8 +33,7 @@ public class URLInfo extends BrowserInfo {
     private boolean extract = false;
 
     /**
-     * null if size is unknown, which means we unable to restore downloads or do
-     * multi thread downlaods
+     * null if size is unknown, which means we unable to restore downloads or do multi thread downlaods
      */
     private Long length;
 
@@ -49,6 +51,9 @@ public class URLInfo extends BrowserInfo {
      * come from Content-Disposition: attachment; filename="fname.ext"
      */
     private String contentFilename;
+
+    // set cookie
+    private String cookie;
 
     /**
      * Notify States
@@ -71,7 +76,7 @@ public class URLInfo extends BrowserInfo {
     private int delay;
 
     private ProxyInfo proxy;
-    
+
     /**
      * connect socket timeout
      */
@@ -96,6 +101,9 @@ public class URLInfo extends BrowserInfo {
         } else {
             conn = (HttpURLConnection) url.openConnection();
         }
+
+        if (cookie != null)
+            conn.setRequestProperty("Cookie", cookie);
 
         conn.setConnectTimeout(CONNECT_TIMEOUT);
         conn.setReadTimeout(READ_TIMEOUT);
@@ -129,16 +137,56 @@ public class URLInfo extends BrowserInfo {
 
                 @Override
                 public HttpURLConnection download() throws IOException {
+                    return download(new URLInfo(url));
+                }
+
+                HttpURLConnection download(URLInfo url) throws IOException {
                     setState(States.EXTRACTING);
                     notify.run();
 
                     try {
-                        return extractRange(url);
+                        return meta(extractRange(url));
                     } catch (DownloadRetry e) {
                         throw e;
                     } catch (RuntimeException e) {
-                        return extractNormal(url);
+                        return meta(extractNormal(url));
                     }
+                }
+
+                HttpURLConnection meta(HttpURLConnection conn) throws IOException {
+                    String[] values = conn.getContentType().split(";");
+                    String contentType = values[0];
+
+                    if (contentType.equals("text/html")) {
+                        String html = WGet.getHtml(conn, stop);
+                        Document doc = Jsoup.parse(html);
+                        Elements links = doc.select("meta[http-equiv=refresh]");
+                        if (!links.isEmpty()) {
+                            String content = links.attr("content");
+                            if (content != null && !content.isEmpty()) {
+                                String[] vv = content.split(";");
+                                if (vv.length > 1) {
+                                    String urlmeta = vv[1];
+                                    String[] url = urlmeta.split("url=");
+                                    if (url.length > 1) {
+                                        URLInfo info = new URLInfo(new URL(url[1]));
+                                        info.setCookie(conn.getHeaderField("Set-cookie"));
+                                        info.setReferer(getSource());
+                                        HttpURLConnection conn2 = download(info);
+
+                                        setReferer(info.getReferer());
+                                        source = info.getSource();
+                                        if (info.getCookie() != null)
+                                            setCookie(info.getCookie()); // TODO sholud we merge cookies?
+
+                                        return conn2;
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    return conn;
                 }
 
                 @Override
@@ -193,8 +241,7 @@ public class URLInfo extends BrowserInfo {
     }
 
     // if range failed - do plain download with no retrys's
-    protected HttpURLConnection extractRange(URL source) throws IOException {
-        URLInfo url = new URLInfo(source);
+    protected HttpURLConnection extractRange(URLInfo url) throws IOException {
         HttpURLConnection conn = url.openConnection();
 
         // may raise an exception if not supported by server
@@ -220,8 +267,7 @@ public class URLInfo extends BrowserInfo {
     }
 
     // if range failed - do plain download with no retrys's
-    protected HttpURLConnection extractNormal(URL source) throws IOException {
-        URLInfo url = new URLInfo(source);
+    protected HttpURLConnection extractNormal(URLInfo url) throws IOException {
         HttpURLConnection conn = url.openConnection();
 
         setRange(false);
@@ -312,6 +358,14 @@ public class URLInfo extends BrowserInfo {
 
     synchronized public void setProxy(ProxyInfo proxy) {
         this.proxy = proxy;
+    }
+
+    synchronized public String getCookie() {
+        return cookie;
+    }
+
+    synchronized public void setCookie(String cookie) {
+        this.cookie = cookie;
     }
 
 }

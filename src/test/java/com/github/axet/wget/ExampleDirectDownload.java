@@ -9,7 +9,7 @@ public class ExampleDirectDownload {
     public static void main(String[] args) {
         try {
             // choise internet url (ftp, http)
-            URL url = new URL("http://www.dd-wrt.com/routerdb/de/download/D-Link/DIR-300/A1/ap61.ram/2049");
+            URL url = new URL("https://sourceforge.net/projects/actualizadorjlojch/files/2.2/ActualizadorJLOJCH.jar");
             // choise target folder or filename "/Users/axet/Downloads/ap61.ram"
             File target = new File("/Users/axet/Downloads/");
             // initialize wget object
