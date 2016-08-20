@@ -15,24 +15,17 @@ import com.github.axet.wget.info.ex.DownloadInterruptedError;
 public class DirectSingle extends Direct {
 
     /**
-     * 
-     * @param info
-     *            download file information
-     * @param target
-     *            target file
+     * @param info   download file information
+     * @param target target file
      */
     public DirectSingle(DownloadInfo info, File target) {
         super(info, target);
     }
 
     /**
-     * 
-     * @param info
-     *            download info
-     * @param stop
-     *            multithread stop command
-     * @param notify
-     *            progress notify call
+     * @param info   download info
+     * @param stop   multithread stop command
+     * @param notify progress notify call
      * @throws IOException
      */
     void downloadPart(DownloadInfo info, AtomicBoolean stop, Runnable notify) throws IOException {
@@ -124,11 +117,9 @@ public class DirectSingle extends Direct {
     /**
      * check existing file for download resume. for single download it will
      * check file dose not exist or zero size. so we can resume download.
-     * 
-     * @param info
-     *            download info
-     * @param targetFile
-     *            target file
+     *
+     * @param info       download info
+     * @param targetFile target file
      * @return return true - if all ok, false - if download can not be restored.
      */
     public static boolean canResume(DownloadInfo info, File targetFile) {

@@ -45,9 +45,8 @@ public class SpeedInfo {
 
     /**
      * Start calculate speed from 'current' bytes downloaded
-     * 
-     * @param current
-     *            current length
+     *
+     * @param current current length
      */
     synchronized public void start(long current) {
         Sample s = new Sample(current);
@@ -58,9 +57,8 @@ public class SpeedInfo {
 
     /**
      * step download process with 'current' bytes downloaded
-     * 
-     * @param current
-     *            current length
+     *
+     * @param current current length
      */
     synchronized public void step(long current) {
         long now = System.currentTimeMillis();
@@ -90,7 +88,7 @@ public class SpeedInfo {
 
     /**
      * Current download speed
-     * 
+     *
      * @return bytes per second
      */
     synchronized public int getCurrentSpeed() {
@@ -112,7 +110,7 @@ public class SpeedInfo {
 
     /**
      * Average speed from start download
-     * 
+     *
      * @return bytes per second
      */
     synchronized public int getAverageSpeed() {
@@ -129,9 +127,8 @@ public class SpeedInfo {
 
     /**
      * Average speed for maximum stepsBack steps
-     * 
-     * @param stepsBack
-     *            how many steps aproximate
+     *
+     * @param stepsBack how many steps aproximate
      * @return bytes per second
      */
     synchronized public int getAverageSpeed(int stepsBack) {
@@ -206,7 +203,7 @@ public class SpeedInfo {
 
     /**
      * Number of samples
-     * 
+     *
      * @return return number of samples in the row (before download restart)
      */
     protected int getRowSamples() {

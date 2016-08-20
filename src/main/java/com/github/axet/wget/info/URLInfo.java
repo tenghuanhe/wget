@@ -17,9 +17,8 @@ import com.github.axet.wget.info.ex.DownloadRetry;
 
 /**
  * URLInfo - keep all information about source in one place. Thread safe.
- * 
+ *
  * @author axet
- * 
  */
 public class URLInfo extends BrowserInfo {
     /**

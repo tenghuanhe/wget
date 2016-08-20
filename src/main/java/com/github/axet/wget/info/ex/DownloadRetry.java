@@ -4,7 +4,7 @@ public class DownloadRetry extends RuntimeException {
     private static final long serialVersionUID = 1L;
 
     public DownloadRetry() {
-        
+
     }
 
     public DownloadRetry(Throwable e) {

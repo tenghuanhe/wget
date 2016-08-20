@@ -29,11 +29,8 @@ public class DirectMultipart extends Direct {
     Object lock = new Object();
 
     /**
-     * 
-     * @param info
-     *            download file information
-     * @param target
-     *            target file
+     * @param info   download file information
+     * @param target target file
      */
     public DirectMultipart(DownloadInfo info, File target) {
         super(info, target);
@@ -41,17 +38,13 @@ public class DirectMultipart extends Direct {
 
     /**
      * download part.
-     * 
+     * <p>
      * if returns normally - part is fully donwloaded. other wise - it throws
      * RuntimeException or DownloadRetry or DownloadError
-     * 
-     * @param part
-     *            downloading part
-     * @param stop
-     *            multithread stop command
-     * @param notify
-     *            progress notify call
-     * 
+     *
+     * @param part   downloading part
+     * @param stop   multithread stop command
+     * @param notify progress notify call
      */
     void downloadPart(Part part, AtomicBoolean stop, Runnable notify) throws IOException {
         RandomAccessFile fos = null;
@@ -201,7 +194,7 @@ public class DirectMultipart extends Direct {
     /**
      * return next part to download. ensure this part is not done() and not
      * currently downloading
-     * 
+     *
      * @return
      */
     Part getPart() {
@@ -217,7 +210,7 @@ public class DirectMultipart extends Direct {
     /**
      * return true, when thread pool empty, and here is no unfinished parts to
      * download
-     * 
+     *
      * @return true - done. false - not done yet
      * @throws InterruptedException
      */
@@ -310,11 +303,9 @@ public class DirectMultipart extends Direct {
     /**
      * check existing file for download resume. for multipart download it may
      * check all parts CRC
-     * 
-     * @param info
-     *            download information
-     * @param targetFile
-     *            target file
+     *
+     * @param info       download information
+     * @param targetFile target file
      * @return return true - if all ok, false - if download can not be restored.
      */
     public static boolean canResume(DownloadInfo info, File targetFile) {

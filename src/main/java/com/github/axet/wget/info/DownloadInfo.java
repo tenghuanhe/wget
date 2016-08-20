@@ -9,9 +9,8 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
  * DownloadInfo class. Keep part information. We need to serialize this class between application restart. Thread safe.
- * 
+ *
  * @author axet
- * 
  */
 @XStreamAlias("DownloadInfo")
 public class DownloadInfo extends URLInfo {
@@ -149,7 +148,7 @@ public class DownloadInfo extends URLInfo {
 
     /**
      * is it a multipart download?
-     * 
+     *
      * @return
      */
     synchronized public boolean multipart() {
@@ -225,9 +224,8 @@ public class DownloadInfo extends URLInfo {
     /**
      * Check if we can continue download a file from new source. Check if new souce has the same file length, title. and
      * supports for range
-     * 
-     * @param newSource
-     *            new source
+     *
+     * @param newSource new source
      * @return true - possible to resume from new location
      */
     synchronized public boolean resume(DownloadInfo newSource) {

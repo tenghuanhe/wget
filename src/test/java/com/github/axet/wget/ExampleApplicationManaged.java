@@ -37,43 +37,43 @@ public class ExampleApplicationManaged {
                     // notify app or save download state
                     // you can extract information from DownloadInfo info;
                     switch (info.getState()) {
-                    case EXTRACTING:
-                    case EXTRACTING_DONE:
-                        System.out.println(info.getState());
-                        break;
-                    case DONE:
-                        // finish speed calculation by adding remaining bytes speed
-                        speedInfo.end(info.getCount());
-                        // print speed
-                        System.out.println(String.format("%s average speed (%s)", info.getState(), formatSpeed(speedInfo.getAverageSpeed())));
-                        break;
-                    case RETRYING:
-                        System.out.println(info.getState() + " " + info.getDelay());
-                        break;
-                    case DOWNLOADING:
-                        speedInfo.step(info.getCount());
-                        long now = System.currentTimeMillis();
-                        if (now - 1000 > last) {
-                            last = now;
+                        case EXTRACTING:
+                        case EXTRACTING_DONE:
+                            System.out.println(info.getState());
+                            break;
+                        case DONE:
+                            // finish speed calculation by adding remaining bytes speed
+                            speedInfo.end(info.getCount());
+                            // print speed
+                            System.out.println(String.format("%s average speed (%s)", info.getState(), formatSpeed(speedInfo.getAverageSpeed())));
+                            break;
+                        case RETRYING:
+                            System.out.println(info.getState() + " " + info.getDelay());
+                            break;
+                        case DOWNLOADING:
+                            speedInfo.step(info.getCount());
+                            long now = System.currentTimeMillis();
+                            if (now - 1000 > last) {
+                                last = now;
 
-                            String parts = "";
+                                String parts = "";
 
-                            for (Part p : info.getParts()) {
-                                if (p.getState().equals(States.DOWNLOADING)) {
-                                    parts += String.format("Part#%d(%.2f) ", p.getNumber(),
-                                            p.getCount() / (float) p.getLength());
+                                for (Part p : info.getParts()) {
+                                    if (p.getState().equals(States.DOWNLOADING)) {
+                                        parts += String.format("Part#%d(%.2f) ", p.getNumber(),
+                                                p.getCount() / (float) p.getLength());
+                                    }
                                 }
+
+                                float p = info.getCount() / (float) info.getLength();
+
+                                System.out.println(String.format("%.2f %s (%s / %s)", p, parts,
+                                        formatSpeed(speedInfo.getCurrentSpeed()),
+                                        formatSpeed(speedInfo.getAverageSpeed())));
                             }
-
-                            float p = info.getCount() / (float) info.getLength();
-
-                            System.out.println(String.format("%.2f %s (%s / %s)", p, parts,
-                                    formatSpeed(speedInfo.getCurrentSpeed()),
-                                    formatSpeed(speedInfo.getAverageSpeed())));
-                        }
-                        break;
-                    default:
-                        break;
+                            break;
+                        default:
+                            break;
                     }
                 }
             };
@@ -88,7 +88,7 @@ public class ExampleApplicationManaged {
             // enable multipart download
             info.enableMultipart();
             // Choice target file or set download folder
-            File target = new File("/Users/axet/Downloads/VirtualBox-5.0.16-105871-OSX.dmg");
+            File target = new File("D:\\BaiduYunDownload\\Downloads\\VirtualBox-5.0.16-105871-OSX.dmg");
             // create wget downloader
             WGet w = new WGet(info, target);
             // init speedinfo

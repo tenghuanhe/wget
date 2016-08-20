@@ -170,21 +170,21 @@ public class RetryWrap {
     public static void check(HttpURLConnection c) throws IOException {
         int code = c.getResponseCode();
         switch (code) {
-        case HttpURLConnection.HTTP_OK:
-        case HttpURLConnection.HTTP_PARTIAL:
-            return;
-        case HttpURLConnection.HTTP_MOVED_TEMP:
-        case HttpURLConnection.HTTP_MOVED_PERM:
-            // rfc2616: the user agent MUST NOT automatically redirect the
-            // request unless it can be confirmed by the user
-            throw new DownloadMoved(c);
-        case HttpURLConnection.HTTP_PROXY_AUTH:
-            throw new ProxyAuth(c);
-        case HttpURLConnection.HTTP_FORBIDDEN:
-            throw new DownloadIOCodeError(code);
-        case 416:
-            // HTTP Error 416 - Requested Range Not Satisfiable
-            throw new DownloadIOCodeError(416);
+            case HttpURLConnection.HTTP_OK:
+            case HttpURLConnection.HTTP_PARTIAL:
+                return;
+            case HttpURLConnection.HTTP_MOVED_TEMP:
+            case HttpURLConnection.HTTP_MOVED_PERM:
+                // rfc2616: the user agent MUST NOT automatically redirect the
+                // request unless it can be confirmed by the user
+                throw new DownloadMoved(c);
+            case HttpURLConnection.HTTP_PROXY_AUTH:
+                throw new ProxyAuth(c);
+            case HttpURLConnection.HTTP_FORBIDDEN:
+                throw new DownloadIOCodeError(code);
+            case 416:
+                // HTTP Error 416 - Requested Range Not Satisfiable
+                throw new DownloadIOCodeError(416);
         }
     }
 }

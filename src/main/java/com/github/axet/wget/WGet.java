@@ -29,7 +29,7 @@ public class WGet {
     public interface HtmlLoader {
         /**
          * some socket problem, retyring
-         * 
+         *
          * @param delay
          * @param e
          */
@@ -48,7 +48,7 @@ public class WGet {
 
     /**
      * download with events control.
-     * 
+     *
      * @param source
      * @param target
      */
@@ -59,11 +59,9 @@ public class WGet {
     /**
      * application controlled download / resume. you should specify targetfile name exactly. since you are choice resume
      * / multipart download. application unable to control file name choice / creation.
-     * 
-     * @param info
-     *            download info
-     * @param targetFile
-     *            target files
+     *
+     * @param info       download info
+     * @param targetFile target files
      */
     public WGet(DownloadInfo info, File targetFile) {
         this.info = info;
